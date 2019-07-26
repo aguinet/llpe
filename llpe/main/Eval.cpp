@@ -2333,13 +2333,13 @@ bool IntegrationAttempt::getNewResult(ShadowInstruction* SI, ImprovedValSet*& Ne
     {
       Constant* Cond = getConstReplacement(SI->getOperand(0));
       if(Cond) {
-	if(cast<ConstantInt>(Cond)->isZero())
-	  return copyImprovedVal(SI->getOperand(2), NewResult);
-	else
-	  return copyImprovedVal(SI->getOperand(1), NewResult);
+        if(isa<ConstantInt>(Cond) && cast<ConstantInt>(Cond)->isZero())
+          return copyImprovedVal(SI->getOperand(2), NewResult);
+        else
+          return copyImprovedVal(SI->getOperand(1), NewResult);
       }
       else {
-	tryMerge = true;
+        tryMerge = true;
       }
     }
     break;
