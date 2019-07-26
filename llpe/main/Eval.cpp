@@ -1543,7 +1543,7 @@ void IntegrationAttempt::tryEvaluateResult(ShadowInstruction* SI,
 
   }
 
-  if(allOpsInts) {
+  if(allOpsInts && isa<IntegerType>(SI->getType())) {
 
     if(IHPFoldIntOp(SI, Ops, intOperands, ImpType, Improved))
       return;

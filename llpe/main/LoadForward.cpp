@@ -705,7 +705,7 @@ Constant* llvm::extractAggregateMemberAt(Constant* FromC, int64_t Offset, Type* 
 // Set shouldTryMulti if we note a case where an ImprovedValSetMulti (extent list) could accommodate the result but ImprovedValSetSingle cannot.
 // That usually happens when reading struct types, vector types and similar that contain pointers and so can't be expressed as bytes.
 // In debug builds, give a verbose reason why the read failed in 'error'.
-void llvm::readValRangeFrom(ShadowValue& V, uint64_t Offset, uint64_t Size, ShadowBB* ReadBB, ImprovedValSet* store, ImprovedValSetSingle& Result, PartialVal*& ResultPV, bool& shouldTryMulti, std::string* error) {
+void llvm::readValRangeFrom(ShadowValue& V, int64_t Offset, uint64_t Size, ShadowBB* ReadBB, ImprovedValSet* store, ImprovedValSetSingle& Result, PartialVal*& ResultPV, bool& shouldTryMulti, std::string* error) {
 
   const ImprovedValSetSingle* IVS = dyn_cast<ImprovedValSetSingle>(store);
   uint64_t IVSSize = ReadBB->getAllocSize(V);
@@ -819,8 +819,8 @@ void llvm::readValRangeFrom(ShadowValue& V, uint64_t Offset, uint64_t Size, Shad
     if(!ResultPV)
       ResultPV = new PartialVal(Size);
 
-    uint64_t FirstReadByte = std::max(Offset, it.start());
-    uint64_t LastReadByte = std::min(Offset + Size, it.stop());
+    int64_t FirstReadByte = std::max(Offset, (int64_t)it.start());
+    int64_t LastReadByte = std::min(Offset + (int64_t)Size, it.stop());
 
     LFV3(errs() << "Merge subval at " << FirstReadByte << "-" << LastReadByte << "\n");
 
@@ -1809,7 +1809,8 @@ void llvm::replaceRangeWithPB(ImprovedValSet* Target, const ImprovedValSetSingle
       Size = M->AllocSize - Offset;
 
     clearRange(M, Offset, Size);
-    M->Map.insert(Offset, Offset + Size, NewVal);
+    assert((Offset + (int64_t)Size) > Offset);
+    M->Map.insert(Offset, Offset + (int64_t)Size, NewVal);
 
     M->CoveredBytes += Size;
     if(M->Underlying && M->CoveredBytes == M->AllocSize) {
@@ -2095,7 +2096,7 @@ bool llvm::canTruncate(const ImprovedValSetSingle& S) {
 // Read store[Offset:Offset+Size] into extent-list 'Results'.
 // ASize is the total size of 'store'. If 'ignoreBelowStore' is set and 'store' is an IVSMulti
 //   (which can be a stack of overlaid extent lists), treat 'ignoreBelowStore' as the bottom of the stack.
-void llvm::readValRangeMultiFrom(uint64_t Offset, uint64_t Size, ImprovedValSet* store, SmallVector<IVSRange, 4>& Results, ImprovedValSet* ignoreBelowStore, uint64_t ASize) {
+void llvm::readValRangeMultiFrom(int64_t Offset, uint64_t Size, ImprovedValSet* store, SmallVector<IVSRange, 4>& Results, ImprovedValSet* ignoreBelowStore, uint64_t ASize) {
 
   if(!store) {
     
@@ -2143,7 +2144,7 @@ void llvm::readValRangeMultiFrom(uint64_t Offset, uint64_t Size, ImprovedValSet*
 
       // Read a sub-value:
       uint64_t SubvalOffset = Offset - it.start();
-      uint64_t SubvalSize = std::min(Offset + Size, it.stop()) - Offset;
+      uint64_t SubvalSize = std::min(Offset + (int64_t)Size, it.stop()) - Offset;
 
       LFV3(errs() << "Add val at " << it.start() << "-" << it.stop() << " subval " << SubvalOffset << "-" << (SubvalOffset + SubvalSize) << "\n");
       
@@ -3462,7 +3463,7 @@ void llvm::executeWriteInst(ShadowValue* Ptr, ImprovedValSetSingle& PtrSet, Impr
     if(!Store)
       return;
 
-    replaceRangeWithPB(Store->store, ValPB, (uint64_t)PtrSet.Values[0].Offset, PtrSize);
+    replaceRangeWithPB(Store->store, ValPB, (int64_t)PtrSet.Values[0].Offset, PtrSize);
     checkStore(Store->store, PtrSet.Values[0].V);
  
   }
@@ -3527,7 +3528,7 @@ void llvm::executeWriteInst(ShadowValue* Ptr, ImprovedValSetSingle& PtrSet, Impr
 
 	}
 
-	replaceRangeWithPB(Store->store, oldValSet, (uint64_t)it->Offset, PtrSize);
+	replaceRangeWithPB(Store->store, oldValSet, (int64_t)it->Offset, PtrSize);
 
       }
 

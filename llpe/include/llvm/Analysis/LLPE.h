@@ -2066,7 +2066,7 @@ inline IntegrationAttempt* ShadowValue::getCtx() const {
  // Load forwarding v3 functions:
  bool addIVToPartialVal(const ImprovedVal& IV, ValSetType SetType, uint64_t IVSOffset, uint64_t PVOffset, uint64_t Size, PartialVal* PV, std::string* error);
  bool addIVSToPartialVal(const ImprovedValSetSingle& IVS, uint64_t IVSOffset, uint64_t PVOffset, uint64_t Size, PartialVal* PV, std::string* error);
- void readValRangeFrom(ShadowValue& V, uint64_t Offset, uint64_t Size, ShadowBB* ReadBB, ImprovedValSet* store, ImprovedValSetSingle& Result, PartialVal*& ResultPV, bool& shouldTryMulti, std::string* error);
+ void readValRangeFrom(ShadowValue& V, int64_t Offset, uint64_t Size, ShadowBB* ReadBB, ImprovedValSet* store, ImprovedValSetSingle& Result, PartialVal*& ResultPV, bool& shouldTryMulti, std::string* error);
  void readValRange(ShadowValue& V, int64_t Offset, uint64_t Size, ShadowBB* ReadBB, ImprovedValSetSingle& Result, ImprovedValSetMulti** ResultMulti, std::string* error);
  void executeStoreInst(ShadowInstruction* StoreSI);
  void executeMemsetInst(ShadowInstruction* MemsetSI);
@@ -2088,7 +2088,7 @@ inline IntegrationAttempt* ShadowValue::getCtx() const {
  void truncateLeft(ImprovedValSetMulti::MapIt& it, uint64_t n, ImprovedValSetMulti::MapIt& replacementStart);
  bool canTruncate(const ImprovedValSetSingle& S);
 
- void readValRangeMultiFrom(uint64_t Offset, uint64_t Size, ImprovedValSet* store, SmallVector<IVSRange, 4>& Results, ImprovedValSet* ignoreBelowStore, uint64_t ASize);
+ void readValRangeMultiFrom(int64_t Offset, uint64_t Size, ImprovedValSet* store, SmallVector<IVSRange, 4>& Results, ImprovedValSet* ignoreBelowStore, uint64_t ASize);
  void readValRangeMulti(ShadowValue& V, uint64_t Offset, uint64_t Size, ShadowBB* ReadBB, SmallVector<IVSRange, 4>& Results);
  void executeMemcpyInst(ShadowInstruction* MemcpySI);
  void executeVaCopyInst(ShadowInstruction* SI);

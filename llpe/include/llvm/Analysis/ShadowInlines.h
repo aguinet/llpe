@@ -743,19 +743,19 @@ struct ImprovedValSetSingle : public ImprovedValSet {
 struct HalfOpenNoMerge {
   /// startLess - Return true if x is not in [a;b].
   /// This is x < a both for closed intervals and for [a;b) half-open intervals.
-  static inline bool startLess(const uint64_t &x, const uint64_t &a) {
+  static inline bool startLess(const int64_t &x, const int64_t &a) {
     return x < a;
   }
 
   /// stopLess - Return true if x is not in [a;b].
   /// This is b < x for a closed interval, b <= x for [a;b) half-open intervals.
-  static inline bool stopLess(const uint64_t &b, const uint64_t &x) {
+  static inline bool stopLess(const int64_t &b, const int64_t &x) {
     return b <= x;
   }
 
   /// adjacent - Return true when the intervals [x;a] and [b;y] can coalesce.
   /// This is a+1 == b for closed intervals, a == b for half-open intervals.
-  static inline bool adjacent(const uint64_t &a, const uint64_t &b) {
+  static inline bool adjacent(const int64_t &a, const int64_t &b) {
     return false;
   }
 
@@ -779,7 +779,7 @@ struct HalfOpenWithMerge {
 
 struct ImprovedValSetMulti : public ImprovedValSet {
 
-  typedef IntervalMap<uint64_t, ImprovedValSetSingle, IntervalMapImpl::NodeSizer<uint64_t, ImprovedValSetSingle>::LeafSize, HalfOpenNoMerge> MapTy;
+  typedef IntervalMap<int64_t, ImprovedValSetSingle, IntervalMapImpl::NodeSizer<int64_t, ImprovedValSetSingle>::LeafSize, HalfOpenNoMerge> MapTy;
   typedef MapTy::iterator MapIt;
   typedef MapTy::const_iterator ConstMapIt;
   MapTy Map;
@@ -1128,7 +1128,7 @@ struct TrackedStore {
 
 typedef SmallVector<TrackedStore*, 1> DSEMapEntry;
 
-typedef IntervalMap<uint64_t, DSEMapEntry, IntervalMapImpl::NodeSizer<uint64_t, DSEMapEntry>::LeafSize, HalfOpenNoMerge> DSEMapTy;
+typedef IntervalMap<int64_t, DSEMapEntry, IntervalMapImpl::NodeSizer<int64_t, DSEMapEntry>::LeafSize, HalfOpenNoMerge> DSEMapTy;
 
 struct TrackedAlloc {
 
@@ -1207,7 +1207,7 @@ struct DSEStoreExtraState {
 
 // Define types for the TL store:
 
-typedef IntervalMap<uint64_t, bool, IntervalMapImpl::NodeSizer<uint64_t, bool>::LeafSize, HalfOpenWithMerge> TLMapTy;
+typedef IntervalMap<int64_t, bool, IntervalMapImpl::NodeSizer<int64_t, bool>::LeafSize, HalfOpenWithMerge> TLMapTy;
 
 class TLMapPointer;
 extern TLMapPointer TLEmptyMapPtr;

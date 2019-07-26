@@ -2170,9 +2170,9 @@ bool IntegrationAttempt::synthCommittedPointer(ShadowValue* I, Type* targetType,
     InTy = cast<PointerType>(InTy)->getElementType();
     if(Type* ElTy = XXXFindElementAtOffset(InTy, Offset, GEPIdxs, GlobalTD)) {
 
-      Result = GetElementPtrInst::Create(ElTy, BaseI, GEPIdxs, VerboseNames ? "synthgep" : "", emitBB);
+      Result = GetElementPtrInst::Create(NULL, BaseI, GEPIdxs, VerboseNames ? "synthgep" : "", emitBB);
       if((!isa<PointerType>(targetType)) || ElTy != cast<PointerType>(targetType)->getElementType())
-	Result = CastInst::CreatePointerCast(Result, targetType, VerboseNames ? "synthcastback" : "", emitBB);
+        Result = CastInst::CreatePointerCast(Result, targetType, VerboseNames ? "synthcastback" : "", emitBB);
       return true;
 
     }
